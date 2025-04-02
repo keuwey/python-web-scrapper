@@ -1,10 +1,26 @@
-# Python-generated files
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.py[cod]
+*$py.class
 
-# Virtual environments
+.ruff_cache
+
+pip-log.txt
+pip-delete-this-directory.txt
+
+instance/
+.webassets-cache
+
+.env
 .venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.idea/
