@@ -24,3 +24,5 @@ dmypy.json
 .pyre/
 .pytype/
 .idea/
+
+anexos_*

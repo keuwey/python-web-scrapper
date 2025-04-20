@@ -21,24 +21,24 @@ class AnexosDownloader:
         self.session.headers.update(self.HEADERS)
 
     def _get_page_content(self, url: str) -> str:
-        """Fetch page content and return as text"""
+        """Fetch page content and return as text."""
         response = self.session.get(url)
         response.raise_for_status()
         return response.text
 
     def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict[str, str]:
         """
-        Extract PDF links for Anexo I and II from page content
-        Returns dictionary with 'Anexo I' and 'Anexo II' as keys
+        Extract PDF links for Anexo I and II from page content.
+        Returns dictionary with 'Anexo I' and 'Anexo II' as keys.
         """
-        links: Any = {}
+        links: Dict[Any, Any] = {}
         pdf_links = soup.select('a.internal-link[href$=".pdf"]')
 
         for link in pdf_links:
             link_text = link.text.strip()
             if "Anexo I" in link_text:
                 links["Anexo I"] = link["href"]
-            elif "Anexo II" in link_text:
+            if "Anexo II" in link_text:
                 links["Anexo II"] = link["href"]
 
         if not links:
@@ -46,7 +46,7 @@ class AnexosDownloader:
         return links
 
     def _download_pdf(self, url: str, path: Path) -> None:
-        """Download a PDF file from URL and save to specified path"""
+        """Download a PDF file from URL and save to specified path."""
         response = self.session.get(url)
         response.raise_for_status()
         with open(path, "wb") as f:
@@ -59,7 +59,7 @@ class AnexosDownloader:
                 zipf.write(path, arcname=path.name)
 
     def run(self) -> Optional[str]:
-        """Main method to execute the download and zip process"""
+        """Main method to execute the download and zip process."""
         try:
             # Fetch and parse page
             html: str = self._get_page_content(self.BASE_URL)
