@@ -2,8 +2,7 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Final, Optional
-
+from typing import Dict, Final, Optional
 import requests
 from bs4 import BeautifulSoup
 
@@ -20,7 +19,7 @@ class AnexosDownloader:
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
 
-    def _get_page_content(self, url: str) -> str:
+    def _get_page_content(self, url: str) -> str | requests.HTTPError:
         """Fetch page content and return as text."""
         response = self.session.get(url)
         response.raise_for_status()
@@ -31,7 +30,7 @@ class AnexosDownloader:
         Extract PDF links for Anexo I and II from page content.
         Returns dictionary with 'Anexo I' and 'Anexo II' as keys.
         """
-        links: Dict[Any, Any] = {}
+        links: Dict[str, str] = {}
         pdf_links = soup.select('a.internal-link[href$=".pdf"]')
 
         for link in pdf_links:
@@ -45,7 +44,7 @@ class AnexosDownloader:
             raise ValueError("No PDF links found for Anexo I or II")
         return links
 
-    def _download_pdf(self, url: str, path: Path) -> None:
+    def _download_pdf(self, url: str, path: Path) -> Optional[requests.HTTPError]:
         """Download a PDF file from URL and save to specified path."""
         response = self.session.get(url)
         response.raise_for_status()
