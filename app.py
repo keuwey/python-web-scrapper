@@ -25,12 +25,12 @@ class AnexosDownloader:
         response.raise_for_status()
         return response.text
 
-    def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict[str, str]:
+    def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict:
         """
         Extract PDF links for Anexo I and II from page content.
         Returns dictionary with 'Anexo I' and 'Anexo II' as keys.
         """
-        links: Dict[str, str] = {}
+        links = {}
         pdf_links = soup.select('a.internal-link[href$=".pdf"]')
 
         for link in pdf_links:
@@ -50,6 +50,7 @@ class AnexosDownloader:
         response.raise_for_status()
         with open(path, "wb") as f:
             f.write(response.content)
+        return None
 
     def _create_zip(self, files: Dict[str, Path], zip_name: str) -> None:
         """Create ZIP archive with given files"""
@@ -61,7 +62,7 @@ class AnexosDownloader:
         """Main method to execute the download and zip process."""
         try:
             # Fetch and parse page
-            html: str = self._get_page_content(self.BASE_URL)
+            html = self._get_page_content(self.BASE_URL)
             soup = BeautifulSoup(html, "html.parser")
 
             # Get PDF links
@@ -81,14 +82,14 @@ class AnexosDownloader:
                         file_path = temp_path / f"{name}.pdf"
                         self._download_pdf(url, file_path)
                         downloaded[name] = file_path
-                        print(f"Downloaded {name}")
+                        print(f"Downloaded '{name}'")
 
                 # Create ZIP with timestamp
                 timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
                 zip_filename = f"anexos_{timestamp}.zip"
                 self._create_zip(downloaded, zip_filename)
 
-                print(f"Created ZIP archive: {zip_filename}")
+                print(f"Created ZIP archive: '{zip_filename}'")
                 return zip_filename
 
         except requests.exceptions.RequestException as e:
