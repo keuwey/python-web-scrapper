@@ -21,9 +21,12 @@ class AnexosDownloader:
 
     def _get_page_content(self, url: str) -> str | requests.HTTPError:
         """Fetch page content and return as text."""
-        response = self.session.get(url)
-        response.raise_for_status()
-        return response.text
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            return response.text
+        except requests.HTTPError as e:
+            return f"HTTP Error: {e}"
 
     def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict:
         """
