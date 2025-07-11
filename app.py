@@ -2,7 +2,8 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Final, Optional
+from typing import Dict, Final, Optional, Set
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -19,22 +20,19 @@ class AnexosDownloader:
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
 
-    def _get_page_content(self, url: str) -> str | requests.HTTPError:
+    def _get_page_content(self, url: str) -> str:
         """Fetch page content and return as text."""
-        try:
-            response = self.session.get(url)
-            response.raise_for_status()
-            return response.text
-        except requests.HTTPError as e:
-            return f"HTTP Error: {e}"
+        response = self.session.get(url)
+        response.raise_for_status()
+        return response.text
 
-    def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict:
+    def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict[str, str]:
         """
         Extract PDF links for Anexo I and II from page content.
         Returns dictionary with 'Anexo I' and 'Anexo II' as keys.
         """
-        links = {}
-        pdf_links = soup.select('a.internal-link[href$=".pdf"]')
+        links: Dict[str, str] = {}
+        pdf_links = soup.select('a.external-link[href$=".pdf"]')
 
         for link in pdf_links:
             link_text = link.text.strip()
@@ -47,13 +45,12 @@ class AnexosDownloader:
             raise ValueError("No PDF links found for Anexo I or II")
         return links
 
-    def _download_pdf(self, url: str, path: Path) -> Optional[requests.HTTPError]:
+    def _download_pdf(self, url: str, path: Path) -> None:
         """Download a PDF file from URL and save to specified path."""
         response = self.session.get(url)
         response.raise_for_status()
         with open(path, "wb") as f:
             f.write(response.content)
-        return None
 
     def _create_zip(self, files: Dict[str, Path], zip_name: str) -> None:
         """Create ZIP archive with given files"""
@@ -70,7 +67,7 @@ class AnexosDownloader:
 
             # Get PDF links
             pdf_links = self._extract_pdf_links(soup)
-            required_anexos = {"Anexo I", "Anexo II"}
+            required_anexos: Set[str] = {"Anexo I", "Anexo II"}
             if not required_anexos.issubset(pdf_links.keys()):
                 missing = required_anexos - pdf_links.keys()
                 raise ValueError(f"Missing required anexos: {', '.join(missing)}")

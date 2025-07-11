@@ -13,4 +13,4 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["mypy>=1.15.0", "pyright>=1.1.400", "ruff>=0.11.6"]
+dev = ["mypy>=1.15.0", "pyright>=1.1.403", "ruff>=0.11.6"]
