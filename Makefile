@@ -1,7 +1,7 @@
 lint:
-	ruff check --fix .
-	ruff format .
+	ruff check --fix *.py
+	ruff format *.py
 
 typecheck:
-	mypy .
-	pyright .
+	mypy *.py
+	pyright *.py

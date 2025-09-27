@@ -2,7 +2,7 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Final, Optional, Set
+from typing import Final, Mapping, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,7 +12,7 @@ class AnexosDownloader:
     BASE_URL: Final[str] = (
         "https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos"
     )
-    HEADERS: Final[Dict[str, str]] = {
+    HEADERS: Final[Mapping[str, str]] = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
 
@@ -26,20 +26,20 @@ class AnexosDownloader:
         response.raise_for_status()
         return response.text
 
-    def _extract_pdf_links(self, soup: BeautifulSoup) -> Dict[str, str]:
+    def _extract_pdf_links(self, soup: BeautifulSoup) -> Mapping[str, str]:
         """
         Extract PDF links for Anexo I and II from page content.
         Returns dictionary with 'Anexo I' and 'Anexo II' as keys.
         """
-        links: Dict[str, str] = {}
+        links: dict[str, str] = {}
         pdf_links = soup.select('a.external-link[href$=".pdf"]')
 
         for link in pdf_links:
             link_text = link.text.strip()
             if "Anexo I" in link_text:
-                links["Anexo I"] = link["href"]
+                links["Anexo I"] = str(link["href"])
             if "Anexo II" in link_text:
-                links["Anexo II"] = link["href"]
+                links["Anexo II"] = str(link["href"])
 
         if not links:
             raise ValueError("No PDF links found for Anexo I or II")
@@ -52,7 +52,7 @@ class AnexosDownloader:
         with open(path, "wb") as f:
             f.write(response.content)
 
-    def _create_zip(self, files: Dict[str, Path], zip_name: str) -> None:
+    def _create_zip(self, files: Mapping[str, Path], zip_name: str) -> None:
         """Create ZIP archive with given files"""
         with zipfile.ZipFile(zip_name, "w") as zipf:
             for name, path in files.items():
@@ -67,7 +67,7 @@ class AnexosDownloader:
 
             # Get PDF links
             pdf_links = self._extract_pdf_links(soup)
-            required_anexos: Set[str] = {"Anexo I", "Anexo II"}
+            required_anexos: set[str] = {"Anexo I", "Anexo II"}
             if not required_anexos.issubset(pdf_links.keys()):
                 missing = required_anexos - pdf_links.keys()
                 raise ValueError(f"Missing required anexos: {', '.join(missing)}")
@@ -75,7 +75,7 @@ class AnexosDownloader:
             # Download PDFs to temp directory
             with TemporaryDirectory() as temp_dir:
                 temp_path = Path(temp_dir)
-                downloaded: Dict[str, Path] = {}
+                downloaded: dict[str, Path] = {}
 
                 for name, url in pdf_links.items():
                     if name in required_anexos:
