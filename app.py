@@ -12,7 +12,7 @@ class AnexosDownloader:
     BASE_URL: Final[str] = ("https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos")
     HEADERS: Final[Mapping[str, str]] = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
 
