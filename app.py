@@ -9,12 +9,8 @@ from bs4 import BeautifulSoup
 
 
 class AnexosDownloader:
-    BASE_URL: Final[str] = (
-        "https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos"
-    )
-    HEADERS: Final[Mapping[str, str]] = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
+    BASE_URL: Final[str] = ("https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos")
+    HEADERS: Final[Mapping[str, str]] = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
 
     def __init__(self) -> None:
         self.session = requests.Session()
@@ -59,7 +55,7 @@ class AnexosDownloader:
                 zipf.write(path, arcname=path.name)
 
     def run(self) -> Optional[str]:
-        """Main method to execute the download and zip process."""
+        """Main method to execute the download and zip processes."""
         try:
             # Fetch and parse page
             html = self._get_page_content(self.BASE_URL)
