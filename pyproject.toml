@@ -13,4 +13,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["mypy>=1.18.1", "pyright>=1.1.408", "ruff>=0.14.14"]
+dev = [
+    "mypy>=1.18.1",
+    "pyright>=1.1.408",
+    "ruff>=0.14.14",
+    "taskipy>=1.14.1",
+]
+
+[tool.taskipy.tasks]
+lint = "ruff check --fix *.py && ruff format *.py"
+typecheck = "mypy *.py && pyright *.py"
